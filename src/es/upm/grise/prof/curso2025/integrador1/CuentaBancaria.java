@@ -16,20 +16,41 @@ public class CuentaBancaria {
 	
 	public CuentaBancaria(String numeroCuenta, double saldoInicial) {
 		
-		// TODO: Realizar
-		
+		this.numeroCuenta = numeroCuenta;
+		this.saldoInicial = saldoInicial;
+		this.admiteDescubierto = false;
+		this.operaciones = new ArrayList<Operacion>();		
 	}
 		
 	public void addOperacion(Operacion operacion) {
-		
-		// TODO: Realizar
+		if (operacion == null) {
+			throw new OperacionNulaException("La operacion no puede ser nula");
+		}
+		boolean existe = this.operaciones.stream().anyMatch(op -> op.getId().equals(operacion.getId()));
+		if (existe) {
+			throw new OperacionDuplicadaException("La operacion ya existe en la cuenta");
+		}
+		this.operaciones.add(operacion);
 		
 	}
 	
 	public double getSaldoActual() {
-		
-		// TODO: Realizar
-		return 0;
+		double saldoActual = this.saldoInicial;
+		for (Operacion operacion : this.operaciones) {
+			saldoActual += operacion.getImporte();
+		}
+
+		BigDecimal bd = BigDecimal.valueOf(saldoActual);
+		bd = bd.setScale(2, RoundingMode.HALF_UP);
+		saldoActual = bd.doubleValue();
+
+		if (!this.admiteDescubierto) {
+			if (saldoActual < 0) {
+				throw new SaldoNegativoException("La cuenta no admite descubierto y el saldo es negativo");
+			}
+		}
+
+		return saldoActual;
 	}
 
 }
