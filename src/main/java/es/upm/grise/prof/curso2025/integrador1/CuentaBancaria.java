@@ -2,6 +2,8 @@ package es.upm.grise.prof.curso2025.integrador1;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 public class CuentaBancaria {
 	
@@ -9,10 +11,7 @@ public class CuentaBancaria {
 	double saldoInicial;
 	boolean admiteDescubierto;
 	List<Operacion> operaciones;
-	
-	//
-	// CUERPO DEL EXAMEN
-	//
+
 	
 	public CuentaBancaria(String numeroCuenta, double saldoInicial) {
 		
@@ -22,11 +21,11 @@ public class CuentaBancaria {
 		this.operaciones = new ArrayList<Operacion>();		
 	}
 		
-	public void addOperacion(Operacion operacion) {
+	public void addOperacion(Operacion operacion) throws OperacionNulaException, OperacionDuplicadaException {
 		if (operacion == null) {
 			throw new OperacionNulaException("La operacion no puede ser nula");
 		}
-		boolean existe = this.operaciones.stream().anyMatch(op -> op.getId().equals(operacion.getId()));
+			boolean existe = this.operaciones.stream().anyMatch(op -> op.getId() == operacion.getId());
 		if (existe) {
 			throw new OperacionDuplicadaException("La operacion ya existe en la cuenta");
 		}
@@ -34,7 +33,7 @@ public class CuentaBancaria {
 		
 	}
 	
-	public double getSaldoActual() {
+	public double getSaldoActual() throws SaldoNegativoException {
 		double saldoActual = this.saldoInicial;
 		for (Operacion operacion : this.operaciones) {
 			saldoActual += operacion.getImporte();
