@@ -64,4 +64,41 @@ public class CuentaBancariaTest {
         // Esto debe lanzar SaldoNegativoException
         cuentaSinDescubierto.getSaldoActual();
     }
+
+    @Test
+    public void testSaldoPositivo() {
+        CuentaBancaria cuentaPositiva = new CuentaBancaria("ES789", 200.0);
+    
+        Operacion ingreso = mock(Operacion.class);
+        when(ingreso.getId()).thenReturn("OP4");
+        when(ingreso.getImporte()).thenReturn(100.0);
+    
+        cuentaPositiva.addOperacion(ingreso);
+    
+        double saldo = cuentaPositiva.getSaldoActual();
+        assertTrue("El saldo debe ser positivo", saldo > 0);
+        assertEquals(300.0, saldo, 0.001);
+    }
+
+    @Test
+    public void testAceptarDescubierto() {
+        CuentaBancaria cuentaConDescubierto = new CuentaBancaria("ES999", 50.0);
+        // Permitimos descubierto manualmente
+        cuentaConDescubierto.admiteDescubierto = true;
+    
+        Operacion retiro = mock(Operacion.class);
+        when(retiro.getId()).thenReturn("OP5");
+        when(retiro.getImporte()).thenReturn(-100.0); 
+    
+        cuentaConDescubierto.addOperacion(retiro);
+    
+        try {
+            double saldo = cuentaConDescubierto.getSaldoActual();
+            assertEquals(-50.0, saldo, 0.001);
+        } catch (SaldoNegativoException e) {
+            fail("No debería lanzarse SaldoNegativoException cuando se permite descubierto");
+        }
+    }
+
+
 }
